@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from rembg import remove
 import streamlit as st
@@ -61,3 +60,4 @@ if uploaded_file is not None:
 # --- Footer ---
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit + rembg + OpenCV")
+
