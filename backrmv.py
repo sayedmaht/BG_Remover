@@ -1,24 +1,49 @@
+from flask import Flask, request, send_file, render_template_string
+import cv2
 import numpy as np
 from rembg import remove
-import streamlit as st
-from PIL import Image
 import io
 
-# --- Page Config ---
-st.set_page_config(
-    page_title="AI Background Remover",
-    page_icon="🖼️",
-    layout="centered"
-)
+app = Flask(__name__)
 
-# --- Header ---
-st.title("🖼️ AI Background Remover")
-st.markdown(
-    """
-    Upload any image and instantly remove its background.  
-    Download the processed image as a PNG with transparency.
-    """
-)
+# Simple HTML form for upload
+HTML_FORM = """
+<!doctype html>
+<title>Background Remover</title>
+<h1>Upload an image to remove background</h1>
+<form method=post enctype=multipart/form-data>
+  <input type=file name=file>
+  <input type=submit value=Upload>
+</form>
+"""
+
+@app.route("/", methods=["GET", "POST"])
+def upload_file():
+    if request.method == "POST":
+        file = request.files["file"]
+        if not file:
+            return "No file uploaded", 400
+
+        # Read image into numpy array
+        file_bytes = np.frombuffer(file.read(), np.uint8)
+        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+
+        # Remove background
+        result = remove(image)
+
+        # Encode result as PNG in memory
+        _, buffer = cv2.imencode(".png", result)
+        return send_file(
+            io.BytesIO(buffer),
+            mimetype="image/png",
+            as_attachment=True,
+            download_name="output_image.png"
+        )
+
+    return render_template_string(HTML_FORM)
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 # --- File Upload ---
 uploaded_file = st.file_uploader(
@@ -48,4 +73,5 @@ if uploaded_file is not None:
         file_name="output_image.png",
         mime="image/png"
     )
+
 
