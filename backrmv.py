@@ -6,6 +6,10 @@ import io
 
 app = Flask(__name__)
 
+@app.route("/")
+def home():
+    return "OK"
+
 # Simple HTML form for upload
 HTML_FORM = """
 <!doctype html>
@@ -73,5 +77,6 @@ if uploaded_file is not None:
         file_name="output_image.png",
         mime="image/png"
     )
+
 
 
