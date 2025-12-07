@@ -27,37 +27,25 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
-    # Show original image
     image = Image.open(uploaded_file)
+
     st.subheader("Original Image")
     st.image(image, width=400)
 
-    # Convert to numpy
-    image_np = np.array(image)
-
-    # Remove background
     with st.spinner("Removing background..."):
-        result = remove(image_np)
+        result = remove(image)  # directly use PIL image
 
-    # Show result
     st.subheader("Background Removed")
     st.image(result, width=400)
 
-    # Convert result to PNG bytes
-    result_pil = Image.fromarray(result)
     buf = io.BytesIO()
-    result_pil.save(buf, format="PNG")
+    result.save(buf, format="PNG")
     byte_im = buf.getvalue()
 
-    # Download button
     st.download_button(
         label="⬇️ Download background‑removed image",
         data=byte_im,
         file_name="output_image.png",
         mime="image/png"
     )
-
-# --- Footer ---
-st.markdown("---")
-st.caption("Built with ❤️ using Streamlit + rembg + OpenCV")
 
