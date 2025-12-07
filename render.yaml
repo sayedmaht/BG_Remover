@@ -3,5 +3,5 @@ services:
     name: background-remover
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn backrmv:app
     plan: free
