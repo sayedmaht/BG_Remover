@@ -1,4 +1,5 @@
-streamlit
+flask
+opencv-python
 numpy
+rembg
 pillow
-rembg[cpu]
