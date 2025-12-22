@@ -1,6 +1,4 @@
-flask
-opencv-python-headless
-numpy
+streamlit
 rembg
-pillow
-gunicorn
+Pillow
+numpy
