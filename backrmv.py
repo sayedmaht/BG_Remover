@@ -6,13 +6,13 @@ import io
 # Page configuration
 st.set_page_config(
     page_title="Background Remover",
-    page_icon="Ħ",
+    page_icon="🎯",
     layout="centered",
     initial_sidebar_state="expanded"
 )
 
 # Title
-st.title("Ħ Background Remover")
+st.title("🎯 Background Remover")
 st.markdown("Remove image backgrounds automatically using AI")
 
 # File uploader
