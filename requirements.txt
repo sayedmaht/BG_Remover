@@ -1,7 +1,6 @@
 streamlit>=1.28.0
 rembg>=0.0.56
-Pillow>=10.0.0
-numpy>=1.24.0
-onnxruntime>=1.16.0      # Required by rembg's ML models
-scipy>=1.10.0             # Required by rembg's image processing
-matplotlib>=3.7.0         # Required by rembg dependencies
+Pillow>=9.0.0
+numpy>=1.21.0
+onnxruntime>=1.15.0,<1.17.0
+scipy>=1.7.0
