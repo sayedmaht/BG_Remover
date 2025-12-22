@@ -1,48 +1,53 @@
 import streamlit as st
+import requests
 from PIL import Image
 import io
+import os
 
 st.set_page_config(page_title="Background Remover", layout="centered")
-
 st.title("🎯 Background Remover")
-st.markdown("Remove backgrounds from images using advanced AI")
 
-col1, col2 = st.columns(2)
+st.markdown("""
+Upload an image and remove its background instantly using AI!
+""")
 
-with col1:
-    st.subheader("Upload Image")
-    uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
+upload = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
 
-if uploaded_file:
-    try:
-        image = Image.open(uploaded_file)
-        with col1:
-            st.image(image, caption="Original", use_column_width=True)
+if upload:
+    img = Image.open(upload)
+    st.image(img, caption="Original", use_column_width=True)
+    
+    if st.button("Remove Background"):
+        st.info("Processing with AI... This may take a moment.")
         
-        if st.button("Remove Background", type="primary", use_container_width=True):
-            with st.spinner("Processing..."):
-                try:
-                    from rembg import remove
-                    input_bytes = io.BytesIO()
-                    image.save(input_bytes, format="PNG")
-                    output_bytes = remove(input_bytes.getvalue())
-                    output_image = Image.open(io.BytesIO(output_bytes))
-                    
-                    with col2:
-                        st.subheader("Result")
-                        st.image(output_image, caption="Background Removed", use_column_width=True)
-                    
-                    st.download_button(
-                        "Download",
-                        data=output_bytes,
-                        file_name="no_bg.png",
-                        mime="image/png",
-                        use_container_width=True
-                    )
-                except Exception as e:
-                    st.error(f"Processing failed: {str(e)[:100]}")
-                    st.info("Try a different image")
-    except Exception as e:
-        st.error("Invalid image file")
+        try:
+            img_bytes = io.BytesIO()
+            img.save(img_bytes, format="PNG")
+            img_bytes.seek(0)
+            
+HF_TOKEN = os.getenv("HF_TOKEN", "")            API_URL = "https://api-inference.huggingface.co/models/briaai/BRIA-2.0-RMBG-ViT-B"
+            
+            headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+            response = requests.post(API_URL, headers=headers, data=img_bytes.getvalue())
+            
+            if response.status_code == 200:
+                result = Image.open(io.BytesIO(response.content))
+                st.image(result, caption="Background Removed", use_column_width=True)
+                
+                result_bytes = io.BytesIO()
+                result.save(result_bytes, format="PNG")
+                result_bytes.seek(0)
+                
+                st.download_button(
+                    "Download Result",
+                    data=result_bytes.getvalue(),
+                    file_name="no_bg.png",
+                    mime="image/png"
+                )
+                st.success("Done!")
+            else:
+                st.error(f"API Error: {response.status_code}")
+        except Exception as e:
+            st.error(f"Error: {str(e)[:100]}")
 else:
-    st.info("📤 Upload an image to start")
+    st.info("Upload an image to start")
