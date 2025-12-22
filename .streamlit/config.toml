@@ -1,0 +1,18 @@
+[client]
+showSidebarNavigation = true
+
+[theme]
+primaryColor = "#FF6B6B"
+backgroundColor = "#F8F9FF"
+secondaryBackgroundColor = "#E8EFFE"
+textColor = "#262730"
+font = "sans serif"
+
+[server]
+maxUploadSize = 200
+
+[logger]
+level = "info"
+
+[ui]
+showStreamlitDeployWarning = false
