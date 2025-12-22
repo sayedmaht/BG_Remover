@@ -4,37 +4,54 @@ from PIL import Image
 import io
 
 # Page configuration
-st.set_page_config(page_title="Background Remover", page_icon="Ħ", layout="centered")
+st.set_page_config(
+    page_title="Background Remover",
+    page_icon="Ħ",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
 
-# Title and description
+# Title
 st.title("Ħ Background Remover")
-st.markdown("""
-Remove image backgrounds effortlessly using AI. Upload a photo and get instant results!
-""")
+st.markdown("Remove image backgrounds automatically using AI")
 
 # File uploader
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"], help="Upload a JPG, JPEG, or PNG image")
+st.subheader("Upload an Image")
+uploaded_file = st.file_uploader(
+    "Choose an image file",
+    type=["jpg", "jpeg", "png"],
+    help="Supported formats: JPG, JPEG, PNG"
+)
 
+# Main logic
 if uploaded_file is not None:
     try:
-        # Load and display original image
+        # Load image
         image = Image.open(uploaded_file)
-        st.image(image, caption='Original Image', use_column_width=True)
+        
+        # Display original image
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Original Image")
+            st.image(image, use_column_width=True)
         
         # Button to remove background
-        if st.button('Remove Background', type="primary", use_container_width=True):
-            with st.spinner('Processing your image... This may take a moment.'):
+        if st.button("Remove Background", type="primary", use_container_width=True):
+            with st.spinner("Processing... This may take a moment"):
                 # Convert image to bytes
                 buf = io.BytesIO()
-                image.save(buf, format='PNG')
+                image.save(buf, format="PNG")
                 byte_im = buf.getvalue()
                 
-                # Remove background using rembg
+                # Remove background
                 result_bytes = remove(byte_im)
                 
-                # Convert back to image for display
+                # Display result
                 result_image = Image.open(io.BytesIO(result_bytes))
-                st.image(result_image, caption='Background Removed', use_column_width=True)
+                
+                with col2:
+                    st.subheader("Result")
+                    st.image(result_image, use_column_width=True)
                 
                 # Download button
                 st.download_button(
@@ -44,8 +61,19 @@ if uploaded_file is not None:
                     mime="image/png",
                     use_container_width=True
                 )
+                
+                st.success("Background removed successfully!")
+    
     except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-        st.info("Please try uploading a different image.")
+        st.error(f"Error processing image: {str(e)}")
+        st.info("Please try with a different image or make sure it's a valid image file.")
 else:
-    st.info("📄 Please upload an image to get started!")
+    st.info("Upload an image to get started!")
+    st.markdown("""
+    ### How it works:
+    1. Upload an image (JPG, JPEG, or PNG)
+    2. Click the 'Remove Background' button
+    3. Download the result
+    
+    The app uses AI to automatically detect and remove backgrounds from your images.
+    """)
